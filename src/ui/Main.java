@@ -1,5 +1,8 @@
 package ui;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Scanner;
 import structures.PilaGenerica;
 import structures.TablasHash;
@@ -43,7 +46,12 @@ public class Main {
                         numeros[i] = Integer.parseInt(partes[i]);
                     }
 
-                    encontrarParesConSuma(numeros, objetivo);
+
+                    List<int[]> list = encontrarParesConSuma(numeros, objetivo);
+
+                    for (int[] par : list) {
+                        System.out.println("(" + par[0] + ", " + par[1] + ")");
+                    }
                     break;
 
                 case 3:
@@ -64,8 +72,27 @@ public class Main {
      * @return true si esta balanceada, false si no
      */
     public boolean verificarBalanceo(String s) {
-        // TODO: completar 
-        return false;
+        if (s == null){
+            return true;
+        }
+
+        PilaGenerica<Character> pila = new PilaGenerica<>(s.length());
+
+        for (char c: s.toCharArray()) {
+            if (c == '(' || c == '[' || c == '{') {
+                pila.Push(c);
+            }
+            else if (c == ')' || c == ']' || c == '}'){
+                if (pila.getTop() == 0) return false;
+                char open = pila.Pop();
+
+                boolean coincide = (open == '(' && c == ')') || (open == '[' && c == ']') || (open == '{' && c == '}');
+                if (!coincide) return false;
+            }
+        }
+
+        return pila.getTop() == 0;
+
     }
 
     /**
@@ -73,8 +100,31 @@ public class Main {
      * @param numeros arreglo de numeros enteros
      * @param objetivo suma objetivo
      */
-    public void encontrarParesConSuma(int[] numeros, int objetivo) {
-        // TODO: completar
+    public List<int[]> encontrarParesConSuma(int[] numeros, int objetivo) throws Exception {
+        List<int[]> resultado = new ArrayList<>();
+
+        if (numeros == null || numeros.length == 0) return resultado;
+        TablasHash tabla = new TablasHash(numeros.length);
+
+        HashSet<String> mostrados = new HashSet<>();
+
+        for (int x : numeros) {
+            int complemento = objetivo - x;
+
+            if (tabla.search(complemento, complemento)) {
+                int menor = Math.min(x, complemento);
+                int mayor = Math.max(x, complemento);
+                String key = menor + ":" + mayor;
+                if (!mostrados.contains(key)) {
+                    mostrados.add(key);
+                    resultado.add(new int[] { menor, mayor });
+                }
+            }
+
+            tabla.insert(x, x);
+        }
+
+        return resultado;
     }
 
     public static void main(String[] args) throws Exception {

@@ -1,5 +1,7 @@
 package structures;
 
+import ui.Main;
+
 import java.util.LinkedList;
 
 import java.lang.UnsupportedOperationException;
@@ -68,7 +70,7 @@ public class TablasHash {
 
   private int hashFunction(int k) throws Exception{
     
-    return k % this.size;
+    return Math.abs(k % this.size);
 
   }
 }
